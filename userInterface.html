@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Interface</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: url('.jpg') center/cover no-repeat; /* Adjust the image path */
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 50px; /* Adjust the margin as needed */
+            color: #333;
+        }
+
+        #bookList {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .book {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .book:hover {
+            transform: scale(1.05);
+        }
+
+        .book img {
+            width: 100%;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .book p {
+            margin: 10px;
+        }
+
+        .bookButtons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 8px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+        }
+        .signupButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+       
+
+    </style>
+</head>
+<body>
+    <h1>User Interface</h1>
+
+    <div id="bookList"></div>
+    <div id="message"></div>
+    <button class="signupButton" onclick="redirectToSignup()">Redirct-to-Signup</button>
+    <script>
+        let currentUser = null;
+        let messageElement = document.getElementById('message');
+
+        // Assume you have access to the book catalog from the admin interface
+        let bookCatalog = JSON.parse(localStorage.getItem('bookCatalog')) || [];
+        /*This function takes an array of book objects as a parameter and dynamically generates the HTML for displaying 
+        the list of books.It creates HTML elements for each book, including an image, title, author, ISBN, genre, and buttons for 
+        checking out and returning a book.The resulting HTML is appended to the 'bookList' div, effectively updating the 
+        user interface*/
+        function renderBookList(books) 
+        {
+            // Get the container element where the book list will be displayed
+            let bookListDiv = document.getElementById('bookList');
+            // Create a new div element to represent a book
+            bookListDiv.innerHTML = '';
+
+            // Display the list of books
+            books.forEach((book, index) => {
+                let bookItem = document.createElement('div');
+                bookItem.className = 'book';
+                bookItem.innerHTML = `<img src="${book.imageUrl}" alt="${book.title}" width="100" height="150">`;
+                bookItem.innerHTML += `<p>Title: ${book.title}</p>`;
+                bookItem.innerHTML += `<p>Author: ${book.author}</p>`;
+                bookItem.innerHTML += `<p>ISBN: ${book.isbn}</p>`;
+                bookItem.innerHTML += `<p>Genre: ${book.genre}</p>`;
+
+                // Buttons for Checkout and Return
+                let bookButtonsDiv = document.createElement('div');
+                bookButtonsDiv.className = 'bookButtons';
+                bookButtonsDiv.innerHTML = `<button onclick="checkoutBook(${index})">Checkout</button>`;
+                bookButtonsDiv.innerHTML += `<button onclick="returnBook(${index})" style="background-color: red; color: white;">Return</button>`;
+                bookItem.appendChild(bookButtonsDiv);
+
+                bookListDiv.appendChild(bookItem); // is appending a newly created div element (bookItem) to the container element (bookListDiv). 
+            });
+        }
+
+        function showMessage(message) 
+        {
+            // Display the message to the user
+            messageElement.textContent = message;
+            // Clear the message after a delay (e.g., 3 seconds)
+            setTimeout(() => {
+                messageElement.textContent = '';
+            }, 3000);
+        }
+        /*Updates the availability of a book to 'Unavailable' when checked out, shows an alert, and updates the  interface.*/
+        function checkoutBook(index) 
+        {
+            // Update availability to 'Checked Out'
+            bookCatalog[index].availability = 'Unavailable';
+            updateLocalStorage();
+            renderBookList(bookCatalog);
+
+            // Show a message to the user
+            alert(`Book "${bookCatalog[index].title}" has been checked out.`);
+        }
+        /*Updates the availability of a book to 'Available' when returned, shows an alert, updates the user interface, 
+        and dispatches a custom 'bookReturned' event.*/
+        function returnBook(index)
+         {
+            // Check if the book is already available
+            if (bookCatalog[index].availability === 'Available') 
+            {
+                alert(`Book "${bookCatalog[index].title}" has been returned.`);
+            } 
+            else 
+            {
+                // Update availability to 'Available'
+                bookCatalog[index].availability = 'Available';
+                updateLocalStorage();
+                renderBookList(bookCatalog);
+        
+                // Show a message to the user
+                alert(`Book "${bookCatalog[index].title}" has been returned.`);
+        
+                // Dispatch a custom event to notify the admin inter6+face
+                const returnEvent = new CustomEvent('bookReturned', {
+                    detail: { title: bookCatalog[index].title }
+                });
+                document.dispatchEvent(returnEvent);
+            }
+        }
+        
+
+       
+        document.addEventListener('bookReturned', function (event) //The callback function takes the event object as a parameter. This object contains information about the triggered event, particularly the details attached to it.
+        {
+            // Update the user interface based on the returned book
+            const returnedBookTitle = event.detail.title;
+            
+            // Find the book in the user interface based on the title
+            const returnedBook = document.querySelector(`.book p:contains("${returnedBookTitle}")`).closest('.book');
+            
+            if (returnedBook) {
+                // Update the availability to 'Available'
+                returnedBook.querySelector('p:contains("Availability")').textContent = 'Availability: Available';
+            }
+        });
+        function updateLocalStorage() 
+        {
+            // Update local storage with the latest book catalog
+            localStorage.setItem('bookCatalog', JSON.stringify(bookCatalog));
+        }
+
+        // Initial rendering
+        renderBookList(bookCatalog);
+        function redirectToSignup() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

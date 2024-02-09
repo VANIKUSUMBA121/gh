@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   
+</head>
+
+<style>
+    body {
+        background-image: url('https://thumbs.dreamstime.com/b/books-copy-space-text-here-wooden-deck-table-library-background-127884489.jpg');
+        background-size: cover;
+        background-position: center;
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column; /* Stack elements vertically */
+        height: 100vh;
+    }
+
+    form {
+       
+        align-items: center;
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        padding: 30px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color:lightskyblue;
+        margin-bottom: 20px; /* Add margin to the bottom of the form */
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        font-size: 24px; /* Increased font size for the heading */
+        margin-bottom: 20px; /* Add margin to the bottom of the heading */
+    }
+
+    label {
+        margin-bottom: 15px; /* Increased margin for more spacing */
+        color: #333;
+        font-size: 16px; /* Increased font size for labels */
+    }
+
+    input,
+    select {
+        padding: 12px; /* Increased padding for larger input fields */
+        margin-bottom: 25px; /* Increased margin for more spacing */
+        box-sizing: border-box;
+        width: 100%;
+        font-size: 16px; /* Increased font size for input fields */
+    }
+
+    button {
+        padding: 10px; /* Increased padding for a larger button */
+        background-color: green;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 18px; /* Increased font size for the button */
+    }
+
+    button:hover {
+        background-color: darkgreen;
+    }
+    
+    a {
+        color: blue; /* Change color to blue */
+        text-decoration: none;
+    }
+    .quotation-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        background-color:orchid;
+        color: white;
+    }
+    
+    .quotation {
+        display: inline-block;
+        animation: scrollText 40s linear infinite; /* Adjust the duration as needed */
+    }
+    
+    @keyframes scrollText {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(1000%);
+        }
+    }
+</style>
+
+<body>
+    <div class="container">
+        <!-- Signup form... -->
+        
+        <form id="signupForm">
+           
+            <h2>Signup</h2>
+            <label for="signupUsername">Username:</label>
+            <input type="text" id="signupUsername" name="signupUsername" placeholder="Enter Username" required>
+            <br><br>
+            <label for="signupEmail">Email:</label>
+            <input type="email" id="signupEmail" name="signupEmail" placeholder="Enter Email" required>
+            <br><br>
+            <label for="signupPassword">Password:</label>
+            <input type="password" id="signupPassword" name="signupPassword" placeholder="Enter Password" required>
+            <br><br>
+            <label for="signupRole">Role:</label>
+            <select id="signupRole" name="signupRole" required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+            <br><br>
+            <button type="button" onclick="signup()" style="background-color: green; color: white;">Signup</button>
+              <!-- Add a login link to redirect to login.html -->
+        <p style="color: black;">Already have an account? <a href="login.html">Login</a></p>
+        </form>
+        
+        <!-- Quotation container with horizontal scroll -->
+        <div class="quotation-container">
+            <blockquote  style="font-size: 22px;" class="quotation">
+                "When in doubt  go to the library"-J.K.Rowling.
+            </blockquote>
+        </div>
+         <!-- Quotation -->
+       
+    </div>
+      
+
+
+        <!-- User interface content goes here -->
+        <div id="userInterface" style="display: none;">
+            <!-- User interface content goes here -->
+        </div>
+
+        <!-- Signup page placeholder -->
+        <div id="signupPage" style="display: none;">
+            <!-- Signup form... -->
+        </div>
+
+        <script>
+            let currentUser = null;
+
+            function switchToLoginDisplay() {
+                document.getElementById('signupPage').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'block';
+                document.getElementById('userInterface').style.display = 'none';
+            }
+
+            function switchToLoginRedirect() {
+                window.location.replace('login.html');
+            }
+
+            function signup() 
+            {
+                const username = document.getElementById('signupUsername').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const role = document.getElementById('signupRole').value;
+
+                // Retrieve user details from localStorage
+                const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+
+                // Check if the username or email already exists
+                if (storedUsers.some(u => u.username === username || u.email === email)) {
+                    alert('Username or email already exists. Please choose a different one.');
+                    return;
+                }
+
+                // Add the new user
+                const newUser = { username, email, password, role };
+                storedUsers.push(newUser);
+                localStorage.setItem('users', JSON.stringify(storedUsers));
+
+                alert('Signup successful! Redirecting to login...');
+
+                // Redirect to login.html after signup
+                switchToLoginRedirect();
+            }
+        </script>
+    </div>
+</body>
+
+</html>

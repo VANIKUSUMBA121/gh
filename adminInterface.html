@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Interface</title>
+    <style>
+        body {
+            background: url('a.jpg') no-repeat 0% center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+           
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #headerContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #searchContainer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input {
+            padding: 8px;
+            width: 200px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .addBookButton {
+            display: block;
+            margin: auto;
+            width: 100px;
+        }
+
+        #bookList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .book {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .book:hover {
+            transform: scale(1.05);
+        }
+
+        .book img {
+            width: 100%;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .book p {
+            margin: 10px;
+            color: #333;
+        }
+
+        .removeButton {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .removeButton:hover {
+            background-color: #c0392b;
+        }
+
+        .highlight {
+            background-color: white!important; /* Use !important to ensure it takes precedence */
+        }
+        
+       
+        
+
+        #addBookForm {
+            display: none;
+            background-color: pink;
+            padding: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            max-width: 300px;
+            margin: auto;
+        }
+    
+        #addBookForm h2 {
+            text-align: center;
+            color: #333;
+        }
+    
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #addBookForm button 
+        {
+            margin-top: 10px;
+            width: 100px; /* Adjust the width as needed */
+     
+        }
+        
+        #addBookForm button[type="submit"] {
+            margin-right: 10px;
+        }
+        
+    
+   
+    
+        .availability {
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+        }
+    
+        .signupButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>Admin Interface</h1>
+
+    <div id="searchContainer">
+        <label for="searchTitle"></label>
+        <input type="text" id="searchTitle" placeholder="Search by Title:">
+        <button onclick="searchBooks()">Search</button>
+    </div>
+   
+
+
+    <button class="addBookButton" onclick="showAddBookForm()">Add Book</button>
+    <button class="signupButton" onclick="redirectToSignup()">Redirect-to-Signup</button>
+
+    <div id="bookList"></div>
+
+    <!-- Add Book Form -->
+    <div id="addBookForm">
+        <h2>Add Book</h2>
+        <form onsubmit="return addBook()">
+            <label for="title">Title:</label>
+            <input type="text" id="title"  placeholder="Enter Title" required>
+
+            <label for="author">Author:</label>
+            <input type="text" id="author"  placeholder="Enter Author" required>
+
+            <label for="isbn">ISBN:</label>
+            <input type="text" id="isbn"   placeholder="Enter ISBN"required>
+
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre"  placeholder="Enter Genre" required>
+
+            <label for="imageUrl">Image:</label>
+            <input type="text" id="imageUrl"  placeholder="Enter Image-Path" required>
+            <label>Book Type:</label>
+            <input type="radio" name="bookType" value="book" onclick="handleBookTypeSelection()"> Book
+            <input type="radio" name="bookType" value="referenceBook" onclick="handleBookTypeSelection()"> Reference Book
+
+            <!-- Reference Book Fields -->
+            <div id="referenceBookFields">
+                <label for="publisher">Publisher:</label>
+                <input type="text" id="publisher" placeholder="Enter Publisher">
+
+                <label for="edition">Edition:</label>
+                <input type="text" id="edition" placeholder="Enter Edition">
+            </div>
+
+            <button type="submit">Add</button>
+            <button type="button" onclick="cancelAddBookForm()">Cancel</button>
+        </form>
+    </div>
+
+    <script>
+        /*This function is triggered when the user selects a book type (either "Book" or "Reference Book") in the add book form.
+         It shows or hides additional fields specific to Reference Books based on the user's selection.*/
+        function handleBookTypeSelection() 
+        {
+            // This function handles the selection of the book type (Book or Reference Book)
+            var referenceBookFields = document.getElementById('referenceBookFields');
+            var referenceBookRadio = document.querySelector('input[name="bookType"][value="referenceBook"]');
+            
+            if (referenceBookRadio.checked) 
+            {
+                referenceBookFields.style.display = 'block';
+            } 
+            else 
+            {
+                referenceBookFields.style.display = 'none';
+            }
+        }/*This is a class definition for a generic Book. It has properties like title, author, isbn, genre,
+         imageUrl, and availability. It also has a renderDetails method to create an HTML representation of the book's details.*/
+        class Book 
+        {
+             // This is a class representing a generic Book
+            constructor(title, author, isbn, genre, imageUrl, availability) 
+            {
+                this.title = title;
+                this.author = author;
+                this.isbn = isbn;
+                this.genre = genre;
+                this.imageUrl = imageUrl;
+                this.availability = availability || 'Available'; // Default availability is 'Available'
+            }
+            // A method to render the details of a book as an HTML string
+            renderDetails() 
+            {
+                return `
+                    <p>Title: ${this.title}</p>
+                    <p>Author: ${this.author}</p>
+                    <p>ISBN: ${this.isbn}</p>
+                    <p>Genre: ${this.genre}</p>
+                    <p>Availability: ${this.availability}</p>
+                `;
+            }
+        }
+        /*This is a class definition for ReferenceBook that extends the Book class. It adds properties like publisher and edition. 
+        It also overrides the renderDetails method of the base class to include the additional details specific to reference books.
+        */
+        class ReferenceBook extends Book 
+        {
+            constructor(title, author, isbn, genre, imageUrl, availability, publisher, edition) 
+            {
+                super(title, author, isbn, genre, imageUrl, availability);
+                this.publisher = publisher || '';
+                this.edition = edition || '';
+            }
+            // Override the renderDetails method of the base class to include additional details for Reference Books
+            renderDetails() 
+            {
+                return `
+                    ${super.renderDetails()}
+                    <p>Publisher: ${this.publisher}</p>
+                    <p>Edition: ${this.edition}</p>
+                `;
+            }
+        }
+        /* initialize variables (currentUser, isSearchMatchFound, bookCatalog) and set up an event listener for the 
+        'bookReturned' event. This event listener updates the UI when a book is returned.*/
+        let currentUser = null;
+        let isSearchMatchFound = false;
+        // Initialize book catalog from local storage or use an empty aray
+        let bookCatalog = JSON.parse(localStorage.getItem('bookCatalog'))|| []; 
+          // Event listener for the 'bookReturned' event, triggered when a book is returned
+        document.addEventListener('bookReturned', function (event) 
+        {
+            // Update the user interface based on the returned book
+            const returnedBookTitle = event.detail.title;
+        
+            // Find the book in the user interface based on the title
+            const returnedBook = Array.from(document.querySelectorAll('.book')).find(book =>
+                book.querySelector('p:nth-of-type(2)').textContent.includes(returnedBookTitle)//p:nth-of-type is a CSS pseudo-class that selects and styles elements based on their position within their parent container.
+            );
+        
+            if (returnedBook) 
+            {
+                // Update the availability to 'Available'
+                returnedBook.querySelector('p:nth-of-type(5)').textContent = 'Availability: Available';
+            }
+        });
+        /*This function takes an array of books and renders them in the UI. It creates DOM elements for each book, including details 
+        like title, author, ISBN, genre, and availability. 
+        It also adds additional details for reference books. The function handles highlighting for search results.
+        */
+        function renderBookList(books) 
+        {
+            // Function to render the list of books in the UI
+            let bookListDiv = document.getElementById('bookList');
+            bookListDiv.innerHTML = '';
+            // Iterate through each book 
+            books.forEach((book, index) => {
+                let bookItem = document.createElement('div');
+                bookItem.className = 'book';
+        
+                if (bookMatchesSearch(book)) 
+                {
+                    isSearchMatchFound = true;
+                }
+                 // Set the inner HTML content for the book element
+                bookItem.innerHTML = `<img src="${book.imageUrl}" alt="${book.title}" width="100" height="150">`;
+                bookItem.innerHTML += `<p>Title: ${book.title}</p>`;
+                bookItem.innerHTML += `<p>Author: ${book.author}</p>`;
+                bookItem.innerHTML += `<p>ISBN: ${book.isbn}</p>`;
+                bookItem.innerHTML += `<p>Genre: ${book.genre}</p>`;
+                bookItem.innerHTML += `<p>Availability: ${book.availability}</p>`;
+        
+                // Check if the book is an instance of ReferenceBook
+                if (book instanceof ReferenceBook) 
+                {
+                    // Render additional details specific to ReferenceBook
+                    bookItem.innerHTML += `<p>Publisher: ${book.publisher}</p>`;
+                    bookItem.innerHTML += `<p>Edition: ${book.edition}</p>`;
+                }
+        
+                bookItem.innerHTML += `<button class="removeButton" onclick="removeBook(${index})">Remove</button>`;
+                bookItem.onclick = function () {
+                    clearHighlights();
+                    bookItem.classList.add('highlight-match');
+                };
+                bookListDiv.appendChild(bookItem);
+            });
+        
+            // Apply highlighting if a match is found
+            if (isSearchMatchFound) 
+            {
+                document.querySelectorAll('.book.highlight-match').forEach(book => {
+                    book.classList.add('highlight-match');
+                });
+                isSearchMatchFound = false; // Reset the flag
+            }
+        }
+        /* This function is called when a user tries to check out a book. It updates the availability of the book to 
+        'Checked Out' and displays a message to the user.*/
+        function checkoutBook(index) 
+        {
+            // Check if the book is already checked out
+            if (bookCatalog[index].availability === 'Checked Out') 
+            {
+                alert(`Book "${bookCatalog[index].title}" is already checked out.`);
+            } 
+            else 
+            {
+                // Update availability to 'Checked Out'
+                bookCatalog[index].availability = 'Checked Out';
+                updateLocalStorage();
+                renderBookList(bookCatalog);
+
+                // Show a message to the user
+                showMessage(`Book "${bookCatalog[index].title}" has been checked out.`);
+            }
+        }
+        /*This function is called when the user submits the add book form. It creates a new book object (either Book or ReferenceBook) 
+        based on the user's selection and adds it to the book catalog. It then updates the UI and hides the form.
+        */
+        function addBook() 
+        {
+            // Function to add a new book to the catalog
+            // Get the selected book type
+            var bookType = document.querySelector('input[name="bookType"]:checked').value;
+        
+            // Create a new book based on the selected type
+            let newBook;
+            if (bookType === 'book') 
+            {
+                newBook = new Book(
+                    document.getElementById('title').value,
+                    document.getElementById('author').value,
+                    document.getElementById('isbn').value,
+                    document.getElementById('genre').value,
+                    document.getElementById('imageUrl').value
+                );
+            } 
+            else if (bookType === 'referenceBook') 
+            {
+                newBook = new ReferenceBook(
+                    document.getElementById('title').value,
+                    document.getElementById('author').value,
+                    document.getElementById('isbn').value,
+                    document.getElementById('genre').value,
+                    document.getElementById('imageUrl').value,
+                    'Available', // Set initial availability
+                    document.getElementById('publisher').value,
+                    document.getElementById('edition').value
+                );
+            }
+        
+            bookCatalog.push(newBook);
+            updateLocalStorage();
+            renderBookList(bookCatalog);
+        
+            // Hide the add book form after submission
+            cancelAddBookForm();
+        
+            // Prevent form submission from refreshing the page
+            return false;
+        }
+        /*These functions handle the display and hiding of the add book form. showAddBookForm sets the display property to 'block', 
+        and cancelAddBookForm sets it to 'none' while also clearing the form fields.
+        */
+        function showAddBookForm() 
+        {
+            // Display the add book form
+            document.getElementById('addBookForm').style.display = 'block';
+        }
+        function cancelAddBookForm() 
+        {
+            // Hide the add book form
+            document.getElementById('addBookForm').style.display = 'none';
+            // Clear form fields
+            document.getElementById('title').value = '';
+            document.getElementById('author').value = '';
+            document.getElementById('isbn').value = '';
+            document.getElementById('genre').value = '';
+            document.getElementById('imageUrl').value = '';
+        }
+        /*This function is called when the user clicks the "Remove" button for a book. It removes the specified book
+         from the catalog, updates local storage, and re-renders the UI.*/
+        function removeBook(index) 
+        {
+            // Remove the specified book from the catalog
+            bookCatalog.splice(index, 1);
+            updateLocalStorage();
+            renderBookList(bookCatalog);
+        }
+
+        function updateLocalStorage() 
+        {
+            // Update local storage with the latest book catalog
+            localStorage.setItem('bookCatalog', JSON.stringify(bookCatalog));
+        }
+        /*This function is called when the user clicks the "Search" button. It searches for books based on the entered title, 
+        highlights matching books, and displays a popup with availability information.
+        */
+        function searchBooks() 
+        {
+            // Search for books based on the title 
+            let searchTitle = document.getElementById('searchTitle').value.toLowerCase();
+        
+            // Clear highlights for all books
+            //clearHighlights();
+        
+            let matchingBooks = [];
+        
+            // Find and highlight the matching books
+            bookCatalog.forEach((book, index) => {
+                if (bookMatchesSearch(book)) {
+                    let bookElement = document.querySelector(`.book:nth-child(${index + 1})`);
+                    if (bookElement) {
+                        bookElement.classList.add('highlight-match');
+                        matchingBooks.push(book);
+                    }
+                }
+            });
+        
+            // Display all books, but highlight the matching ones
+            renderBookList(bookCatalog);
+        
+            // Show a popup with book availability information
+            showAvailabilityPopup(matchingBooks);
+        }
+        
+        /*This function checks if a book's title matches the entered search criteria.*/
+        function bookMatchesSearch(book) 
+        {
+            // Check if the book title matches the search criteria
+            const searchTitle = document.getElementById('searchTitle').value.toLowerCase();
+            return book.title.toLowerCase().includes(searchTitle);
+        }
+        /*This function generates a popup with information about the availability of matching books 
+        and displays it using the alert function
+        */
+
+        function showAvailabilityPopup(matchingBooks) 
+        {
+            let popupContent = 'Book Availability:\n\n';
+        
+            if (matchingBooks.length === 0) 
+            {
+                popupContent += 'No matching books found.';
+            } 
+            else 
+            {
+                matchingBooks.forEach(book => {
+                    popupContent += `Title: ${book.title}\nAvailability: ${book.availability}\n\n`;
+                });
+            }
+            alert(popupContent);
+        }
+        /*This function removes the 'highlight-match' class from all book elements, clearing any highlighting*/
+        function clearHighlights() 
+        {
+            // Remove highlight class from all books
+            let books = document.querySelectorAll('.book');
+            books.forEach(book => {
+                book.classList.remove('highlight-match');
+            });
+        }
+        
+        /*This function is called when a user returns a book. It sets the book's availability to 'Available', updates the UI, 
+        and dispatches a custom 'bookReturned' event.*/
+        function returnBook(index) 
+        {
+            
+            // For example, set the book availability to 'Available'
+            bookCatalog[index].availability = 'Available';
+            updateLocalStorage();
+            renderBookList(bookCatalog);
+    
+            // Dispatch a custom event to notify the user interface
+            const returnEvent = new CustomEvent('bookReturned', {
+                detail: { title: bookCatalog[index].title }
+            });
+            document.dispatchEvent(returnEvent);
+        }
+    
+
+        // Initial rendering
+        renderBookList(bookCatalog);
+        function redirectToSignup() 
+        {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: url('https://t4.ftcdn.net/jpg/05/92/12/51/360_F_592125192_QfdYEap9Kw1DyXqqqF7FNI5SBuQkR5pN.jpg') center/cover no-repeat; /* Adjust the image path */
+        }
+
+        .container {
+            max-width: 400px;
+            margin: auto;
+            text-align: center;
+            background-color: paleturquoise; /* Semi-transparent white background */
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 50px; /* Adjust the margin as needed */
+        }
+
+        form 
+        {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        input {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        select {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        a {
+            color: green;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="loginPage">
+        <!-- Login form... -->
+        <form id="loginForm">
+            <h2>Login</h2>
+            <label for="loginUsername">Username:</label>
+            <input type="text" id="loginUsername" name="loginUsername"  placeholder="Enter Username" required>
+            <br><br>
+            <label for="loginPassword">Password:</label>
+            <input type="password" id="loginPassword" name="loginPassword" placeholder="Enter Password" required>
+            <br><br>
+            <label for="loginRole">Role:</label>
+            <select id="loginRole" name="loginRole" required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+            <br><br>
+            <button type="button" onclick="login()" style="background-color: green; color: white;">Login</button>
+        </form>
+
+        <!-- Add a signup link on the login page -->
+        <p>Don't have an account? <a href="#" onclick="switchToSignup()">Signup</a></p>
+
+        <script>
+            function switchToSignup() 
+            {
+                // Implement the logic to redirect to signup.html
+                window.location.href = 'index.html';
+            }
+
+            function login() 
+            {
+                const username = document.getElementById('loginUsername').value;
+                const password = document.getElementById('loginPassword').value;
+                const role = document.getElementById('loginRole').value;
+
+                // Retrieve user details from localStorage
+                const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+                const user = storedUsers.find(u => u.username === username && u.password === password && u.role === role);
+
+                if (user) 
+                {
+                    currentUser = user;
+                    if (role === 'user') 
+                    {
+                        // Redirect to userInterface.html
+                        window.location.href = 'userInterface.html';
+                    } 
+                    else if (role === 'admin') 
+                    {
+                        // Redirect to adminInterface.html
+                        window.location.href = 'adminInterface.html';
+                    }
+                } 
+                else 
+                {
+                    alert('Invalid credentials. Please try again.');
+                }
+            }
+        </script>
+    </div>
+</body>
+
+</html>
